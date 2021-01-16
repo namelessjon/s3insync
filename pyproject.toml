@@ -1,0 +1,11 @@
+[build-system]
+requires = ["flit_core >=2,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.metadata]
+module = "s3insync"
+author = "Jonathan Stott"
+author-email = "jonathan.stott@gmail.com"
+home-page = "https://github.com/namelessjon/s3insync"
+classifiers = ["License :: OSI Approved :: Apache Software License"]
+
