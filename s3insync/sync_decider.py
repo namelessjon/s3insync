@@ -1,7 +1,7 @@
 import fnmatch
 import re
 
-import src.operations as op
+import s3insync.operations as op
 
 
 class SyncDecider:

@@ -1,6 +1,6 @@
-import src.sync_decider as sd
-import src.repositories as r
-import src.operations as o
+import s3insync.sync_decider as sd
+import s3insync.repositories as r
+import s3insync.operations as o
 
 
 def test_a_new_will_be_synced():

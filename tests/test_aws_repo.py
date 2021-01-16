@@ -4,7 +4,7 @@ import boto3
 import moto
 import pytest
 
-import src.repositories as r
+import s3insync.repositories as r
 
 
 @pytest.fixture(scope='function')
