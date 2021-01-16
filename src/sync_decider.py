@@ -30,7 +30,6 @@ class SyncDecider:
             if seen is False and not self.entry_excluded(entry):
                 yield op.Delete(entry, from_repo, to_repo)
 
-
     def entry_excluded(self, entry: str) -> bool:
         if self.excludes is None:
             return False
