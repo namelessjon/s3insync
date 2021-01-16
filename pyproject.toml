@@ -8,4 +8,13 @@ author = "Jonathan Stott"
 author-email = "jonathan.stott@gmail.com"
 home-page = "https://github.com/namelessjon/s3insync"
 classifiers = ["License :: OSI Approved :: Apache Software License"]
+requires = [
+    "boto3 ~=1.16",
+]
+
+[tool.flit.metadata.requires-extra]
+test = [
+    "pytest",
+    "moto",
+]
 
