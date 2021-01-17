@@ -67,6 +67,9 @@ class AwsRepo:
         except self.client.exceptions.NoSuchKey:
             raise KeyError(f"Object '{path}' not found in {self.name}")
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.name!r}, uri={self.uri!r})"
+
 
 class LocalFSRepo:
     def __init__(self, name: str, root: str, staging: str):
@@ -142,6 +145,9 @@ class LocalFSRepo:
             return True
         except OSError:
             return False
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.name!r}, root={self.root!r})"
 
 
 class TestRepo:
