@@ -134,6 +134,15 @@ class LocalFSRepo:
                 os.remove(temp_path)
             return False
 
+    def delete(self, path: str) -> bool:
+        try:
+            os.remove(self.fullpath(path))
+            return True
+        except FileNotFoundError:
+            return True
+        except OSError:
+            return False
+
 
 class TestRepo:
     def __init__(self, name: str, entries=None):
