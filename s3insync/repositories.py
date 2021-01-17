@@ -1,6 +1,7 @@
 import dataclasses as dc
 import hashlib
 import os
+import tempfile
 import typing as t
 import urllib.parse as up
 import shutil
@@ -38,7 +39,7 @@ class AwsRepo:
             self.client = client
         self.maxkeys = maxkeys
 
-    def __iter__(self):
+    def __iter__(self) -> t.Iterator[Entry]:
         token = None
         while True:
             args = {
@@ -72,8 +73,15 @@ class LocalFSRepo:
         self.name = name
         self.root = root
         self.staging = staging
+        self._entries = None
 
-    def __iter__(self):
+    @property
+    def entries(self):
+        if self._entries is None:
+            self._entries = {e.path: e for e in self.walk_repo()}
+        return self._entries
+
+    def walk_repo(self):
         for dirpath, dirnames, filenames in os.walk(self.root):
 
             prefix = dirpath[len(self.root) + 1:]
@@ -82,8 +90,21 @@ class LocalFSRepo:
                 md5 = self.md5_file(path)
                 yield Entry(path, md5)
 
+    def contents(self, path):
+        if path in self.entries:
+            entry = self.entries[path]
+            return Contents(entry.path, entry.content_id, open(self.fullpath(path), "rb"))
+        else:
+            raise KeyError(f"Object '{path}' not found in {self.name}")
+
+    def fullpath(self, path: str) -> str:
+        return os.path.join(self.root, path)
+
+    def __iter__(self) -> t.Iterator[Entry]:
+        yield from self.entries.values()
+
     def md5_file(self, path: str):
-        full_path = os.path.join(self.root, path)
+        full_path = self.fullpath(path)
         hsh = hashlib.md5()
         with open(full_path, "rb") as f:
             while True:
@@ -95,14 +116,23 @@ class LocalFSRepo:
         return hsh.hexdigest()
 
     def write(self, contents: Contents):
-        temp_name = hashlib.md5(contents.path.encode()).hexdigest()
-        temp_path = os.path.join(self.staging, temp_name)
+        try:
+            temp_path = None
+            with tempfile.NamedTemporaryFile(dir=self.staging, delete=False) as f:
+                temp_path = f.name
+                shutil.copyfileobj(contents.body, f)
 
-        with os.fdopen(os.open(temp_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY), "wb") as f:
-            shutil.copyfileobj(contents.body, f)
+            full_path = self.fullpath(contents.path)
 
-        full_path = os.path.join(self.root, contents.path)
-        shutil.move(temp_path, full_path)
+            dirname = os.path.dirname(full_path)
+            os.makedirs(dirname, exist_ok=True)
+            shutil.move(temp_path, full_path)
+            self.entries[contents.path] = Entry(contents.path, contents.content_id)
+            return True
+        except OSError:
+            if temp_path and os.path.exists(temp_path):
+                os.remove(temp_path)
+            return False
 
 
 class TestRepo:

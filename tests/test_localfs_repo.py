@@ -21,6 +21,8 @@ def fake_local_filesystem(fs):
     with open("repository/c/d", "w") as f:
         f.write("d")
 
+    fs.set_disk_usage(100)
+
     return fs
 
 
@@ -46,8 +48,38 @@ def test_localfs_repo_entries_is_files_from_the_path(local_repo):
                        ]
 
 
+def test_localfs_repo_allows_getting_an_entry(local_repo):
+    contents = local_repo.contents('a')
+
+    assert contents.path == 'a'
+    assert contents.content_id == "0cc175b9c0f1b6a831c399e269772661"
+
+
 def test_localfs_repo_allows_writing_to_path(local_repo):
     contents = r.Contents("e", "e", io.BytesIO(b'e'))
     local_repo.write(contents)
 
     assert os.path.exists('repository/e')
+    assert open('repository/e').read() == 'e'
+
+    entries = list(local_repo)
+
+    assert set(entries) == {r.Entry("a", "0cc175b9c0f1b6a831c399e269772661"),
+                            r.Entry("b", "92eb5ffee6ae2fec3ad71c777531578f"),
+                            r.Entry(path='c/d', content_id='8277e0910d750195b448797616e091ad'),
+                            r.Entry("e", "e"),
+                            }
+
+
+def test_localfs_repo_allows_writing_to_path_which_is_nested(local_repo):
+    contents = r.Contents("f/e", "e", io.BytesIO(b'e'))
+    local_repo.write(contents)
+
+    assert os.path.exists('repository/f/e')
+
+
+def test_localfs_repo_wont_partially_write_a_file(local_repo):
+    contents = r.Contents("a", "a", io.BytesIO(b'e' * 200))
+    local_repo.write(contents)
+
+    assert open('repository/a').read() == 'a'
