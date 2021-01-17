@@ -40,15 +40,17 @@ class SyncDecider:
                 yield op.Delete(entry, from_repo, to_repo)
 
     def execute_sync(self, from_repo, to_repo) -> t.Dict[str, int]:
-        counts = collections.Counter()
+        successes = collections.Counter()
+        failures = collections.Counter()
         for operation in self.sync(from_repo, to_repo):
             success = operation.execute()
             if not success:
-                counts[f"{operation.name}.failure"] += 1
+                failures[operation.name] += 1
                 log.error(f"Failed to execute {operation}")
-            counts[operation.name] += 1
+            successes[operation.name] += 1
+            successes['total'] += 1
 
-        return {**counts}
+        return dict(successes), dict(failures)
 
     def entry_excluded(self, entry: str) -> bool:
         if self.excludes is None:
