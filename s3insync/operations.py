@@ -10,7 +10,7 @@ class Copy:
     def execute(self):
         contents = self.from_repo.contents(self.path)
 
-        self.to_repo.write(self.path, contents)
+        return self.to_repo.write(self.path, contents)
 
 
 @dc.dataclass()
@@ -20,4 +20,4 @@ class Delete:
     to_repo: object
 
     def execute(self):
-        self.to_repo.delete(self.path)
+        return self.to_repo.delete(self.path)
