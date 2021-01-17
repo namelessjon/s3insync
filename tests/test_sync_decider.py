@@ -20,7 +20,7 @@ def test_an_identical_file_will_not_be_synced():
 
     ops = list(syncd.sync(from_repo, to_repo))
 
-    assert ops == []
+    assert ops == [o.Nop("a", from_repo, to_repo)]
 
 
 def test_a_missing_file_will_be_deleted():
@@ -30,7 +30,7 @@ def test_a_missing_file_will_be_deleted():
 
     ops = list(syncd.sync(from_repo, to_repo))
 
-    assert ops == [o.Delete("b", from_repo, to_repo)]
+    assert ops == [o.Nop("a", from_repo, to_repo), o.Delete("b", from_repo, to_repo)]
 
 
 def test_an_excluded_file_is_not_synced():
@@ -40,7 +40,7 @@ def test_an_excluded_file_is_not_synced():
 
     ops = list(syncd.sync(from_repo, to_repo))
 
-    assert ops == []
+    assert ops == [o.Nop("a", from_repo, to_repo), o.Excluded("b", from_repo, to_repo)]
 
 
 def test_an_excluded_file_is_not_deleted():
@@ -50,7 +50,7 @@ def test_an_excluded_file_is_not_deleted():
 
     ops = list(syncd.sync(from_repo, to_repo))
 
-    assert ops == []
+    assert ops == [o.Nop("a", from_repo, to_repo)]
 
 
 def test_an_excludes_can_be_globs():
@@ -60,7 +60,7 @@ def test_an_excludes_can_be_globs():
 
     ops = list(syncd.sync(from_repo, to_repo))
 
-    assert ops == []
+    assert ops == [o.Nop("a", from_repo, to_repo)]
 
 
 def test_a_present_file_whose_content_has_changed_will_be_synced():
