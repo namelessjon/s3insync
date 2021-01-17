@@ -27,6 +27,7 @@ def aws_ab_repo(s3):
     s3.create_bucket(Bucket="example")
     s3.put_object(Bucket="example", Key="path/a", Body=b'a')
     s3.put_object(Bucket="example", Key="path/b", Body=b'b')
+    s3.put_object(Bucket="example", Key="path/c/d", Body=b'e')
 
     aws = r.AwsRepo("aws", "s3://example/path", s3)
 
@@ -49,17 +50,23 @@ def test_aws_repo_takes_name_s3uri_client(s3):
 
 
 def test_aws_repo_entries_is_files_from_the_path(aws_ab_repo):
-    entries = list(aws_ab_repo)
+    entries = set(aws_ab_repo)
 
-    assert entries == [r.Entry("a", "0cc175b9c0f1b6a831c399e269772661"), r.Entry("b", "92eb5ffee6ae2fec3ad71c777531578f")]
+    assert entries == {r.Entry("a", "0cc175b9c0f1b6a831c399e269772661"),
+                       r.Entry("b", "92eb5ffee6ae2fec3ad71c777531578f"),
+                       r.Entry("c/d", "e1671797c52e15f763380b45e841ec32"),
+                       }
 
 
 def test_aws_repo_entries_is_files_from_the_path_even_if_there_are_lots(aws_ab_repo):
     aws_ab_repo.maxkeys = 1
 
-    entries = list(aws_ab_repo)
+    entries = set(aws_ab_repo)
 
-    assert entries == [r.Entry("a", "0cc175b9c0f1b6a831c399e269772661"), r.Entry("b", "92eb5ffee6ae2fec3ad71c777531578f")]
+    assert entries == {r.Entry("a", "0cc175b9c0f1b6a831c399e269772661"),
+                       r.Entry("b", "92eb5ffee6ae2fec3ad71c777531578f"),
+                       r.Entry("c/d", "e1671797c52e15f763380b45e841ec32"),
+                       }
 
 
 def test_aws_repo_can_retrieve_contents_by_path(aws_ab_repo):
