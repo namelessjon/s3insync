@@ -1,6 +1,9 @@
 import dataclasses as dc
+import hashlib
+import os
 import typing as t
 import urllib.parse as up
+import shutil
 
 import boto3
 
@@ -62,6 +65,44 @@ class AwsRepo:
             return Contents(path, obj['ETag'].strip('"'), obj['Body'])
         except self.client.exceptions.NoSuchKey:
             raise KeyError(f"Object '{path}' not found in {self.name}")
+
+
+class LocalFSRepo:
+    def __init__(self, name: str, root: str, staging: str):
+        self.name = name
+        self.root = root
+        self.staging = staging
+
+    def __iter__(self):
+        for dirpath, dirnames, filenames in os.walk(self.root):
+
+            prefix = dirpath[len(self.root) + 1:]
+            for fn in filenames:
+                path = os.path.join(prefix, fn)
+                md5 = self.md5_file(path)
+                yield Entry(path, md5)
+
+    def md5_file(self, path: str):
+        full_path = os.path.join(self.root, path)
+        hsh = hashlib.md5()
+        with open(full_path, "rb") as f:
+            while True:
+                dat = f.read(4096)
+                if dat == b'':
+                    break
+                hsh.update(dat)
+
+        return hsh.hexdigest()
+
+    def write(self, contents: Contents):
+        temp_name = hashlib.md5(contents.path.encode()).hexdigest()
+        temp_path = os.path.join(self.staging, temp_name)
+
+        with os.fdopen(os.open(temp_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY), "wb") as f:
+            shutil.copyfileobj(contents.body, f)
+
+        full_path = os.path.join(self.root, contents.path)
+        shutil.move(temp_path, full_path)
 
 
 class TestRepo:
