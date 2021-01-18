@@ -45,7 +45,7 @@ def run(args):
         start_sync.set_to_current_time()
 
         success, failures = sync.execute_sync(src, dest)
-        files_in_s3.set(success.pop('total'))
+        files_in_s3.set(success.pop('total', 0))
         for t, count in success.items():
             op_count.labels(t).inc(count)
         for t, count in failures.items():
