@@ -18,8 +18,8 @@ def run_pull(args):
     excludes = args.exclude
     interval = args.interval
 
-    i = pc.Info('my_build_version', 'Description of info')
-    i.info({'version': s3insync.__version__, 'aws_repo': s3uri, 'localpath': localpath, 'interval': interval})
+    i = pc.Info('s3insync_version', 'Version and config information for the client')
+    i.info({'version': s3insync.__version__, 'aws_repo': s3uri, 'localpath': localpath,})
     start_sync = pc.Gauge('s3insync_last_sync_time', 'Time the last sync was started')
     start_time = pc.Gauge('s3insync_start_time', 'Time the sync process was started')
     op_count = pc.Counter('s3insync_operations', 'Count of operations', labelnames=('type',))
