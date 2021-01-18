@@ -148,6 +148,10 @@ class LocalFSRepo:
         except OSError:
             return False
 
+    def ensure_directories(self):
+        os.makedirs(self.root, exist_ok=True)
+        os.makedirs(self.staging, exist_ok=True)
+
     def __repr__(self):
         return f"{self.__class__.__name__}({self.name!r}, root={self.root!r})"
 

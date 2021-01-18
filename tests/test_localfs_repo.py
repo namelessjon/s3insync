@@ -27,6 +27,13 @@ def fake_local_filesystem(fs):
 
 
 @pytest.fixture()
+def fake_local_filesystem_empty(fs):
+    fs.set_disk_usage(100)
+
+    return fs
+
+
+@pytest.fixture()
 def local_repo(fake_local_filesystem):
     return r.LocalFSRepo("local", "repository", "staging")
 
@@ -103,3 +110,12 @@ def test_localfs_repo_successfully_deletes_a_file_which_doesnt_exist(local_repo)
 
 def test_localfs_repo_returns_false_if_it_cant_delete_file(local_repo):
     assert not local_repo.delete('c/d')
+
+
+def test_localfs_can_set_up_directories(fake_local_filesystem_empty):
+    local = r.LocalFSRepo("local", "repository", "staging")
+
+    local.ensure_directories()
+
+    assert os.path.isdir('repository')
+    assert os.path.isdir('staging')
