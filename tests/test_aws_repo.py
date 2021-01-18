@@ -23,13 +23,18 @@ def s3(aws_credentials):
 
 
 @pytest.fixture()
-def aws_ab_repo(s3):
+def aws_bucket(s3):
     s3.create_bucket(Bucket="example")
     s3.put_object(Bucket="example", Key="path/a", Body=b'a')
     s3.put_object(Bucket="example", Key="path/b", Body=b'b')
     s3.put_object(Bucket="example", Key="path/c/d", Body=b'e')
 
-    aws = r.AwsRepo("aws", "s3://example/path", s3)
+    return s3
+
+
+@pytest.fixture()
+def aws_ab_repo(aws_bucket):
+    aws = r.AwsRepo("aws", "s3://example/path", aws_bucket)
 
     return aws
 
@@ -79,3 +84,13 @@ def test_aws_repo_can_retrieve_contents_by_path(aws_ab_repo):
 def test_aws_repo_raises_key_error_if_file_doesnt_exist(aws_ab_repo):
     with pytest.raises(KeyError):
         aws_ab_repo.contents('c')
+
+
+def test_aws_repo_entries_also_works_with_trailing_slash(aws_bucket):
+    repo = r.AwsRepo("aws", "s3://example/path/", aws_bucket)
+    entries = set(repo)
+
+    assert entries == {r.Entry("a", "0cc175b9c0f1b6a831c399e269772661"),
+                       r.Entry("b", "92eb5ffee6ae2fec3ad71c777531578f"),
+                       r.Entry("c/d", "e1671797c52e15f763380b45e841ec32"),
+                       }

@@ -33,6 +33,9 @@ class AwsRepo:
         parsed = up.urlparse(self.uri)
         self.bucket = parsed.netloc
         self.prefix = parsed.path[1:]
+
+        if not self.prefix.endswith('/'):
+            self.prefix = self.prefix + "/"
         if client is None:
             self.client = boto3.client('s3')
         else:
@@ -53,7 +56,7 @@ class AwsRepo:
             response = self.client.list_objects_v2(**args)
 
             for entry in response['Contents']:
-                key = entry['Key'][len(self.prefix) + 1:]
+                key = entry['Key'][len(self.prefix):]
                 yield Entry(key, entry['ETag'].strip('"'))
             token = response.get('NextContinuationToken')
             if token is None:
@@ -61,7 +64,7 @@ class AwsRepo:
 
     def contents(self, path: str):
         try:
-            obj = self.client.get_object(Bucket=self.bucket, Key=f'{self.prefix}/{path}')
+            obj = self.client.get_object(Bucket=self.bucket, Key=f'{self.prefix}{path}')
 
             return Contents(path, obj['ETag'].strip('"'), obj['Body'])
         except self.client.exceptions.NoSuchKey:
