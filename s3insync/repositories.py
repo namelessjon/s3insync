@@ -142,7 +142,7 @@ class LocalFSRepo:
     def delete(self, path: str) -> bool:
         try:
             os.remove(self.fullpath(path))
-            
+
             if path in self.entries:
                 del self.entries[path]
 
