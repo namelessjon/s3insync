@@ -1,3 +1,5 @@
+import logging
+
 import s3insync.cmd.pull as pull
 
 
@@ -6,6 +8,9 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.set_defaults(func=lambda x: parser.print_help())
+
+    parser.add_argument('--debug', action='store_true', default=False, help="Run with debug logging")
+    parser.add_argument('--log-level', default="INFO", help="set log level", choices=('INFO', 'WARN', 'ERROR', ))
 
     subparsers = parser.add_subparsers(help='sub-command help')
 
@@ -21,4 +26,20 @@ def main():
     parser_pull.set_defaults(func=pull.run)
 
     args = parser.parse_args()
+
+    if args.debug:
+        level = 'DEBUG'
+    else:
+        level = args.log_level
+    setup_logging(level)
+
     args.func(args)
+
+
+def setup_logging(level):
+    logging.basicConfig(level=level)
+
+    logging.getLogger('botocore').setLevel(logging.WARNING)
+    logging.getLogger('boto3').setLevel(logging.WARNING)
+    logging.getLogger('urllib3').setLevel(logging.WARNING)
+
