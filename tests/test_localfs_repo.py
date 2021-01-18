@@ -55,7 +55,7 @@ def test_localfs_repo_entries_is_files_from_the_path(local_repo):
                        ]
 
 
-def test_localfs_repo_allows_getting_an_entry(local_repo):
+def test_localfs_repo_allows_getting_contents_of_an_entry(local_repo):
     contents = local_repo.contents('a')
 
     assert contents.path == 'a'
@@ -65,6 +65,17 @@ def test_localfs_repo_allows_getting_an_entry(local_repo):
 def test_localfs_repo_raises_a_key_error_if_the_content_doesnt_exist(local_repo):
     with pytest.raises(KeyError):
         local_repo.contents('c')
+
+
+def test_localfs_repo_allows_getting_an_entry(local_repo):
+    contents = local_repo.get('a')
+
+    assert contents.path == 'a'
+    assert contents.content_id == "0cc175b9c0f1b6a831c399e269772661"
+
+
+def test_localfs_repo_get_returns_none_for_missing_key(local_repo):
+    assert local_repo.get('c') is None
 
 
 def test_localfs_repo_allows_writing_to_path(local_repo):
@@ -98,10 +109,13 @@ def test_localfs_repo_wont_partially_write_a_file(local_repo):
 
 
 def test_localfs_repo_allows_deleting_a_file(local_repo):
+    assert local_repo.get('a') is not None
     assert local_repo.delete('a')
     assert not os.path.exists('repository/a')
     assert set(local_repo) == {r.Entry("b", "92eb5ffee6ae2fec3ad71c777531578f"),
                                r.Entry(path='c/d', content_id='8277e0910d750195b448797616e091ad'), }
+
+    assert local_repo.get('a') is None
 
 
 def test_localfs_repo_successfully_deletes_a_file_which_doesnt_exist(local_repo):

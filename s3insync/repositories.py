@@ -142,6 +142,10 @@ class LocalFSRepo:
     def delete(self, path: str) -> bool:
         try:
             os.remove(self.fullpath(path))
+            
+            if path in self.entries:
+                del self.entries[path]
+
             return True
         except FileNotFoundError:
             return True
@@ -151,6 +155,9 @@ class LocalFSRepo:
     def ensure_directories(self):
         os.makedirs(self.root, exist_ok=True)
         os.makedirs(self.staging, exist_ok=True)
+
+    def get(self, path):
+        return self.entries.get(path)
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.name!r}, root={self.root!r})"
