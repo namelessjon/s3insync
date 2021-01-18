@@ -113,11 +113,10 @@ class LocalFSRepo:
         full_path = self.fullpath(path)
         hsh = hashlib.md5()
         with open(full_path, "rb") as f:
-            while True:
-                dat = f.read(4096)
-                if dat == b'':
-                    break
+            dat = f.read(4096)
+            while dat:
                 hsh.update(dat)
+                dat = f.read(4096)
 
         return hsh.hexdigest()
 
