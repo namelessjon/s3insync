@@ -1,13 +1,15 @@
 import logging
 import os
 import os.path
+import threading
 import time
+import signal
 
 import prometheus_client as pc
 
 import s3insync
-import s3insync.sync_decider as sd
 import s3insync.repositories as r
+import s3insync.sync_decider as sd
 
 logger = logging.getLogger()
 
@@ -35,7 +37,9 @@ def run(args):
 
     sync = sd.SyncDecider(excludes)
 
-    while True:
+    set_exit = setup_signals()
+
+    while not set_exit:
         logger.info("Starting sync")
         start = time.monotonic()
         start_sync.set_to_current_time()
@@ -50,4 +54,17 @@ def run(args):
         stop = time.monotonic()
         duration = stop - start
         logger.info("Stopping sync")
-        time.sleep(max(30, interval - duration))
+        set_exit.wait(max(30, interval - duration))
+
+
+def setup_signals() -> threading.Event:
+    set_exit = threading.Event()
+
+    def quit(signo, _frame):
+        logger.info("Interrupted by %d, shutting down", signo)
+        set_exit.set()
+
+    for sig in ('SIGTERM', 'SIGHUP', 'SIGINT'):
+        signal.signal(getattr(signal, sig), quit)
+
+    return set_exit
