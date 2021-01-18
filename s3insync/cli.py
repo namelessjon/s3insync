@@ -54,6 +54,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser()
+    parser.set_defaults(func=lambda x: parser.print_help())
 
     subparsers = parser.add_subparsers(help='sub-command help')
 
