@@ -40,7 +40,7 @@ def run(args):
     set_exit = setup_signals()
 
     while not set_exit:
-        logger.info("Starting sync")
+        logger.debug("Starting sync")
         start = time.monotonic()
         start_sync.set_to_current_time()
 
@@ -53,7 +53,7 @@ def run(args):
 
         stop = time.monotonic()
         duration = stop - start
-        logger.info("Stopping sync")
+        logger.debug("Stopping sync")
         set_exit.wait(max(30, interval - duration))
 
 
