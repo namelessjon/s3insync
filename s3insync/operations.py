@@ -7,13 +7,12 @@ class Copy:
     from_repo: object
     to_repo: object
 
+    name = "copy"
+
     def execute(self):
         contents = self.from_repo.contents(self.path)
 
         return self.to_repo.write(self.path, contents)
-
-    def name(self) -> str:
-        return "copy"
 
 
 @dc.dataclass()
@@ -22,11 +21,10 @@ class Delete:
     from_repo: object
     to_repo: object
 
+    name = "delete"
+
     def execute(self):
         return self.to_repo.delete(self.path)
-
-    def name(self) -> str:
-        return "delete"
 
 
 @dc.dataclass()
@@ -35,11 +33,10 @@ class Nop:
     from_repo: object
     to_repo: object
 
+    name = "nop"
+
     def execute(self):
         return True
-
-    def name(self) -> str:
-        return "nop"
 
 
 @dc.dataclass()
@@ -48,8 +45,7 @@ class Excluded:
     from_repo: object
     to_repo: object
 
+    name = "excluded"
+
     def execute(self):
         return True
-
-    def name(self) -> str:
-        return "excluded"
