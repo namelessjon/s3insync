@@ -10,9 +10,8 @@ class Copy:
     name = "copy"
 
     def execute(self):
-        contents = self.from_repo.contents(self.path)
-
-        return self.to_repo.write(contents)
+        with self.from_repo.contents(self.path) as contents:
+            return self.to_repo.write(contents)
 
 
 @dc.dataclass()

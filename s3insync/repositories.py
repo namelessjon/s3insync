@@ -25,6 +25,12 @@ class Contents:
         if hasattr(self.body, name):
             return getattr(self.body, name)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, _e, _v, _t):
+        self.close()
+
 
 class AwsRepo:
     def __init__(self, name: str, uri: str, client=None, maxkeys=1000):
