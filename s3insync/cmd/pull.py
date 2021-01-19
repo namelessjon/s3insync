@@ -39,7 +39,7 @@ def run(args):
 
     set_exit = setup_signals()
 
-    while not set_exit:
+    while set_exit.is_set():
         logger.debug("Starting sync")
         start = time.monotonic()
         start_sync.set_to_current_time()
