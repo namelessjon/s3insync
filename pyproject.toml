@@ -19,3 +19,5 @@ test = [
     "pyfakefs",
 ]
 
+[tool.flit.scripts]
+s3insync = "s3insync.cli:main"
