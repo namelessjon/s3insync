@@ -1,6 +1,8 @@
 S3InSync
 ========
 
+![Python package](https://github.com/namelessjon/s3insync/workflows/Python%20package/badge.svg)
+
 Daemon to continuously and incrementally synchronize a directory from remote
 object store to a local directory.  Inspired by [objinsync](https://github.com/scribd/objinsync) but written in
 python and presently less fully featured.
