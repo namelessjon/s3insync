@@ -23,25 +23,25 @@ class SyncDecider:
             path = entry.path
 
             if self.entry_excluded(path):
-                log.debug("entry=%r, status='excludeded'", entry)
+                log.debug("entry=%r status='excluded' action='ignore'", entry)
                 yield op.Excluded(path, from_repo, to_repo)
                 continue
 
             if path not in seen_paths:
-                log.debug("entry=%r, status='new,pulling'", entry)
+                log.debug("entry=%r status='new' action='pull'", entry)
                 yield op.Copy(path, from_repo, to_repo)
             elif path in seen_paths and entry != to_repo.get(path):
-                log.debug("entry=%r, status='updated,pulling'", entry)
+                log.debug("entry=%r status='updated' action='pull'", entry)
                 yield op.Copy(path, from_repo, to_repo)
             else:
-                log.debug("entry=%r, status='nop'", entry)
+                log.debug("entry=%r status='in sync' action='nop'", entry)
                 yield op.Nop(path, from_repo, to_repo)
 
             seen_paths[entry.path] = True
 
         for entry, seen in seen_paths.items():
             if seen is False and not self.entry_excluded(entry):
-                log.debug("entry=%r, status='gone,deleting'", entry)
+                log.debug("entry=%r status='gone' action='delete'", entry)
                 yield op.Delete(entry, from_repo, to_repo)
 
     def execute_sync(self, from_repo, to_repo) -> t.Dict[str, int]:
