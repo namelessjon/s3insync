@@ -1,5 +1,6 @@
 import dataclasses as dc
 import hashlib
+import logging
 import os
 import tempfile
 import typing as t
@@ -7,6 +8,9 @@ import urllib.parse as up
 import shutil
 
 import boto3
+
+
+log = logging.getLogger(__name__)
 
 
 @dc.dataclass(frozen=True)
@@ -141,6 +145,7 @@ class LocalFSRepo:
             self.entries[contents.path] = Entry(contents.path, contents.content_id)
             return True
         except OSError:
+            log.exception("Problem writing %r to %r", contents.path, self)
             if temp_path and os.path.exists(temp_path):
                 os.remove(temp_path)
             return False
@@ -156,6 +161,7 @@ class LocalFSRepo:
         except FileNotFoundError:
             return True
         except OSError:
+            log.exception("Problem deleting %r from %r", path, self)
             return False
 
     def ensure_directories(self):
