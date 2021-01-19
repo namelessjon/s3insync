@@ -16,5 +16,6 @@ requires = [
 test = [
     "pytest",
     "moto",
+    "pyfakefs",
 ]
 
