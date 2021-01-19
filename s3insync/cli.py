@@ -42,4 +42,3 @@ def setup_logging(level):
     logging.getLogger('botocore').setLevel(logging.WARNING)
     logging.getLogger('boto3').setLevel(logging.WARNING)
     logging.getLogger('urllib3').setLevel(logging.WARNING)
-
