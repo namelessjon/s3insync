@@ -61,7 +61,7 @@ class AwsRepo:
 
             response = self.client.list_objects_v2(**args)
 
-            for entry in response['Contents']:
+            for entry in response.get('Contents', []):
                 key = entry['Key'][len(self.prefix):]
                 yield Entry(key, entry['ETag'].strip('"'))
             token = response.get('NextContinuationToken')

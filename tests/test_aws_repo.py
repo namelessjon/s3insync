@@ -94,3 +94,10 @@ def test_aws_repo_entries_also_works_with_trailing_slash(aws_bucket):
                        r.Entry("b", "92eb5ffee6ae2fec3ad71c777531578f"),
                        r.Entry("c/d", "e1671797c52e15f763380b45e841ec32"),
                        }
+
+
+def test_aws_repo_entries_works_with_empty_bucket(aws_bucket):
+    repo = r.AwsRepo("aws", "s3://example/nonexistantpath/", aws_bucket)
+    entries = set(repo)
+
+    assert not entries
