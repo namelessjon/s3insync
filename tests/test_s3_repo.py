@@ -34,20 +34,20 @@ def aws_bucket(s3):
 
 @pytest.fixture()
 def aws_ab_repo(aws_bucket):
-    aws = r.AwsRepo("aws", "s3://example/path", aws_bucket)
+    aws = r.S3Repo("aws", "s3://example/path", aws_bucket)
 
     return aws
 
 
 def test_aws_repo_takes_name_s3uri():
-    aws = r.AwsRepo("aws", "s3://example/path")
+    aws = r.S3Repo("aws", "s3://example/path")
 
     assert aws.name == "aws"
     assert aws.uri == "s3://example/path"
 
 
 def test_aws_repo_takes_name_s3uri_client(s3):
-    aws = r.AwsRepo("aws", "s3://example/path", s3)
+    aws = r.S3Repo("aws", "s3://example/path", s3)
 
     assert aws.name == "aws"
     assert aws.uri == "s3://example/path"
@@ -87,7 +87,7 @@ def test_aws_repo_raises_key_error_if_file_doesnt_exist(aws_ab_repo):
 
 
 def test_aws_repo_entries_also_works_with_trailing_slash(aws_bucket):
-    repo = r.AwsRepo("aws", "s3://example/path/", aws_bucket)
+    repo = r.S3Repo("aws", "s3://example/path/", aws_bucket)
     entries = set(repo)
 
     assert entries == {r.Entry("a", "0cc175b9c0f1b6a831c399e269772661"),
@@ -97,7 +97,7 @@ def test_aws_repo_entries_also_works_with_trailing_slash(aws_bucket):
 
 
 def test_aws_repo_entries_works_with_empty_bucket(aws_bucket):
-    repo = r.AwsRepo("aws", "s3://example/nonexistantpath/", aws_bucket)
+    repo = r.S3Repo("aws", "s3://example/nonexistantpath/", aws_bucket)
     entries = set(repo)
 
     assert not entries

@@ -32,7 +32,7 @@ class Contents:
         self.close()
 
 
-class AwsRepo:
+class S3Repo:
     def __init__(self, name: str, uri: str, client=None, maxkeys=1000):
         self.name = name
         self.uri = uri

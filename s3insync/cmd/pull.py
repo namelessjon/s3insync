@@ -31,7 +31,7 @@ def run(args):
     files_in_s3 = pc.Gauge('s3insync_files_in_s3', 'Number of files in S3',)
 
     pc.start_http_server(8087)
-    src = r.AwsRepo('aws', s3uri)
+    src = r.S3Repo('s3', s3uri)
     dest = r.LocalFSRepo('fs', localpath, os.path.join(os.getenv('HOME'), ".s3insync"))
     dest.ensure_directories()
 
