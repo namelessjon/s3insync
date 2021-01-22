@@ -10,6 +10,7 @@ home-page = "https://github.com/namelessjon/s3insync"
 classifiers = ["License :: OSI Approved :: Apache Software License"]
 requires = [
     "boto3 ~=1.16",
+    "prometheus_client"
 ]
 
 [tool.flit.metadata.requires-extra]
