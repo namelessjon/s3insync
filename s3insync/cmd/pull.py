@@ -46,15 +46,18 @@ def run(args):
 
         success, failures = sync.execute_sync(src, dest)
         files_in_s3.set(success.pop('total', 0))
-        for t, count in success.items():
-            op_count.labels(t).inc(count)
-        for t, count in failures.items():
-            failed_op_count.labels(t).inc(count)
+        set_op_counts(success, op_count)
+        set_op_counts(failures, failed_op_count)
 
         stop = time.monotonic()
         duration = stop - start
         logger.debug("Stopping sync")
         set_exit.wait(max(30, interval - duration))
+
+
+def set_op_counts(items: t.Dict[str, int], metric: pc.Counter):
+    for typ, count in items.items():
+        metric.labels(typ).inc(count)
 
 
 def setup_signals() -> threading.Event:
