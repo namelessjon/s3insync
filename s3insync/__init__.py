@@ -17,4 +17,4 @@ When running in daemon mode, a prometheus metrics endpoint is served at
 `:8087/metrics`.
 """
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
