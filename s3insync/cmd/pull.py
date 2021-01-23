@@ -53,9 +53,8 @@ def run(args):
         except Exception:
             logger.exception("Failed to excute sync")
 
-        stop = time.monotonic()
-        duration = stop - start
-        logger.debug("Stopping sync")
+        duration = time.monotonic() - start
+        logger.debug("Stopping sync after %g secs", duration)
 
         set_exit.wait(max(30, interval - duration))
 
