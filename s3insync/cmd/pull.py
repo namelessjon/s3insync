@@ -3,6 +3,7 @@ import os
 import os.path
 import threading
 import time
+import typing as t
 import signal
 
 import prometheus_client as pc
@@ -44,10 +45,10 @@ def run(args):
         start = time.monotonic()
 
         try:
-        success, failures = sync.execute_sync(src, dest)
-        files_in_s3.set(success.pop('total', 0))
-        set_op_counts(success, op_count)
-        set_op_counts(failures, failed_op_count)
+            success, failures = sync.execute_sync(src, dest)
+            files_in_s3.set(success.pop('total', 0))
+            set_op_counts(success, op_count)
+            set_op_counts(failures, failed_op_count)
             last_sync.set_to_current_time()
         except Exception:
             logger.exception("Failed to excute sync")
@@ -55,7 +56,7 @@ def run(args):
         stop = time.monotonic()
         duration = stop - start
         logger.debug("Stopping sync")
-        
+
         set_exit.wait(max(30, interval - duration))
 
 
@@ -68,7 +69,7 @@ def setup_signals() -> threading.Event:
     set_exit = threading.Event()
 
     def quit(signo, _frame):
-        logger.info("Interrupted by %d, shutting down", signo)
+        logger.info("Received signal(%d), shutting down", signo)
         set_exit.set()
 
     for sig in ('SIGTERM', 'SIGHUP', 'SIGINT'):
