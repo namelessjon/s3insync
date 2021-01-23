@@ -15,12 +15,12 @@ Usage
 s3insync pull --exclude '*/__pycache__/*' s3://bucket/prefix ./localdir
 ```
 
-When running in daemon mode, a prometheus metrics endponit is served at
+When running in daemon mode, a prometheus metrics endpoint is served at
 `:8087/metrics`.
 
 ---
 
-Enable debug logs by passing the `--debug` flag `DEBUG=1 s3insync --debug pull ...`
+Enable debug logs by passing the `--debug` flag `s3insync --debug pull ...`
 
 
 Installation
