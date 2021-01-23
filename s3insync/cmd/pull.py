@@ -25,7 +25,7 @@ def run(args):
     start_time = pc.Gauge('s3insync_start_time', 'Time the sync process was started')
     start_time.set_to_current_time()
 
-    start_sync = pc.Gauge('s3insync_last_sync_time', 'Time the last sync was started')
+    last_sync = pc.Gauge('s3insync_last_sync_time', 'Time the last sync completed')
     op_count = pc.Counter('s3insync_operations', 'Count of operations', labelnames=('type',))
     failed_op_count = pc.Counter('s3insync_failed_operations', 'Count of failed operations', labelnames=('type',))
     files_in_s3 = pc.Gauge('s3insync_files_in_s3', 'Number of files in S3',)
@@ -42,16 +42,20 @@ def run(args):
     while not set_exit.is_set():
         logger.debug("Starting sync")
         start = time.monotonic()
-        start_sync.set_to_current_time()
 
+        try:
         success, failures = sync.execute_sync(src, dest)
         files_in_s3.set(success.pop('total', 0))
         set_op_counts(success, op_count)
         set_op_counts(failures, failed_op_count)
+            last_sync.set_to_current_time()
+        except Exception:
+            logger.exception("Failed to excute sync")
 
         stop = time.monotonic()
         duration = stop - start
         logger.debug("Stopping sync")
+        
         set_exit.wait(max(30, interval - duration))
 
 
